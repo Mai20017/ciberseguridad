@@ -1,0 +1,113 @@
+ENTORNO DE EJECUCION DEL PIPELINE SAST + DAST
+==============================================================
+
+Generado: 2026-10-10T18:12:30+00:00 (UTC)
+Proyecto: Framework de reduccion de falsos positivos (SAST + DAST)
+Aplicacion evaluada: OWASP Benchmark v1.2
+
+HARDWARE
+--------------------------------------------------------------
+CPU:                  11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+Nucleos disponibles:  16
+Memoria disponible:   7.6 GiB
+Nota: son los recursos que el motor de Docker expone al pipeline,
+      que son los que realmente limitaron la ejecucion.
+
+PLATAFORMA
+--------------------------------------------------------------
+Python:               3.11.17
+Nucleo:               Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.41
+Docker (servidor):    29.0.1
+Docker (cliente):     29.8.2
+SO anfitrion:         Docker Desktop
+
+VERSIONES DE LAS HERRAMIENTAS
+--------------------------------------------------------------
+Tal como cada herramienta se identifico durante la ejecucion.
+
+BenchmarkUtils (crawler)
+    version: 1.3
+    fuente:  commit ef982a71c377dd43d58652a450bf25fb7a8582ad
+BenchmarkUtils (scorer oficial)
+    version: 1.3
+    fuente:  commit ef982a71c377dd43d58652a450bf25fb7a8582ad
+FindSecBugs
+    version: 1.14.0
+    fuente:  pom.xml del Benchmark (perfil findsecbugs)
+Maven/JDK
+    version: maven:3.9.16-eclipse-temurin-17
+    fuente:  docker-compose.yml
+OWASP Benchmark
+    version: 1.2 (commit 8b67a88d73b2594570fc21150705283de884620b, 2026-10-01T09:45:08-04:00)
+    fuente:  https://github.com/OWASP-Benchmark/BenchmarkJava.git
+OWASP ZAP
+    version: 2.15.0
+    fuente:  zaproxy/zap-stable:2.15.0
+Semgrep
+    version: 1.180.0
+    fuente:  semgrep/semgrep:1.180.0
+SpotBugs
+    version: 4.10.4
+    fuente:  pom.xml del Benchmark
+Tomcat
+    version: 9.0.122
+    fuente:  pom.xml
+ZAP ascanrules
+    version: 69.0.0
+    fuente:  add-on de ZAP
+ZAP pscanrules
+    version: 61.1.0
+    fuente:  add-on de ZAP
+imagen tft-benchmark
+    version: sha256:2d8872d5ef6ced2152e1849764339f053a92463778b64270bb8b46156df57319
+    fuente:  docker/benchmark.Dockerfile
+
+IMAGENES DOCKER FIJADAS
+--------------------------------------------------------------
+maven        maven:3.9.16-eclipse-temurin-17
+python       python:3.11.17-slim
+semgrep      semgrep/semgrep:1.180.0
+zap          zaproxy/zap-stable:2.15.0
+
+TIEMPO POR ETAPA
+--------------------------------------------------------------
+Ultima ejecucion correcta de cada etapa.
+
+etapa                               segundos   minutos
+1-deploy                               429.7       7.2
+10-sensibilidad-clustering              95.1       1.6
+11-carga-revision                        0.9       0.0
+12-informe                               0.5       0.0
+2-sast                                 621.6      10.4
+2a-sast-semgrep                        535.9       8.9
+2b-sast-spotbugs                        82.5       1.4
+3-dast                                4218.0      70.3
+3b-dast-crawl                           11.5       0.2
+3c-dast-active-scan                   4156.5      69.3
+4-normalize                              1.0       0.0
+5-map                                    0.5       0.0
+6-verify                             14585.7     243.1
+7-cluster                                6.2       0.1
+8-evaluate                               1.2       0.0
+9-validacion-scorer-oficial             14.4       0.2
+--------------------------------------------------------------
+TOTAL                                24761.2     412.7
+
+Las sub-etapas (2a, 2b, 3b, 3c...) estan incluidas dentro del tiempo de
+su etapa principal, por lo que el TOTAL las cuenta dos veces.
+La etapa 9 no forma parte del pipeline: es la validacion externa de las
+metricas con el scorer oficial del Benchmark y se lanza aparte.
+Hay 5 intentos fallidos registrados en provenance.jsonl, excluidos de esta tabla.
+
+CONFIGURACION RELEVANTE DEL EXPERIMENTO
+--------------------------------------------------------------
+Commit del Benchmark:     8b67a88d73b2594570fc21150705283de884620b
+Casos de prueba:          2740 (external_benchmark_src/expectedresults-1.2.csv)
+CWE evaluados:            [22, 78, 79, 89, 90, 327, 328, 330, 501, 614, 643]
+CWE excluidos:            [352] (sin casos en el Benchmark)
+CWE no verificables DAST: [90, 327, 328, 330, 501]
+ZAP, politica de escaneo: St-Med-Th-Low
+ZAP, inyeccion cabeceras: True
+ZAP, inyeccion cookies:   True
+Semgrep, rulesets:        p/java, p/owasp-top-ten
+

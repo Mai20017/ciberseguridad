@@ -1,0 +1,8 @@
+configuracion,hallazgos_entregados,items_distintos,items_agrupando_dast_por_regla,en_ambito_y_de_su_categoria,en_ambito_pero_de_otra_categoria,cwe_fuera_del_ambito,reduccion_items_vs_C1_pct,reduccion_items_agrupados_vs_C1_pct
+C0-semgrep,1909,1779,1779,1763,146,0,78.93,78.93
+C0-spotbugs,8233,7881,7881,2510,893,4830,6.66,6.66
+C0-zap,16251,10238,24,708,50,15493,-21.26,99.72
+C1,10142,8443,8443,4273,1039,4830,0.0,0.0
+C2,16251,10238,24,708,50,15493,-21.26,99.72
+C3,26393,18681,8467,4981,1089,20323,-121.26,-0.28
+C4,25712,18211,7997,4352,1037,20323,-115.69,5.28

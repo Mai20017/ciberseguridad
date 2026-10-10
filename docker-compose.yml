@@ -1,0 +1,90 @@
+name: tft
+
+services:
+  # Aplicacion bajo analisis: OWASP Benchmark v1.2 sobre Tomcat 9 (HTTPS 8443)
+  benchmark:
+    build:
+      context: .
+      dockerfile: docker/benchmark.Dockerfile
+    image: tft-benchmark:1.2
+    container_name: tft-benchmark
+    ports:
+      - "8443:8443"
+    networks:
+      - tft-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -ksf https://localhost:8443/benchmark/ >/dev/null"]
+      interval: 15s
+      timeout: 10s
+      retries: 60
+      start_period: 90s
+
+  # Motor DAST en modo daemon, controlado por API desde el orquestador
+  zap:
+    image: zaproxy/zap-stable:2.15.0
+    container_name: tft-zap
+    networks:
+      - tft-net
+    ports:
+      - "8090:8090"
+    command:
+      # -Xmx lo extrae zap.sh y lo pasa a la JVM. El escaneo completo del
+      # Benchmark acumula cientos de miles de mensajes y con el heap por
+      # defecto la API deja de responder.
+      - zap.sh
+      - -Xmx3g
+      - -daemon
+      - -host
+      - 0.0.0.0
+      - -port
+      - "8090"
+      - -config
+      - api.key=tft-zap-key
+      - -config
+      - api.addrs.addr.name=.*
+      - -config
+      - api.addrs.addr.regex=true
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8090/JSON/core/view/version/ >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  # Crawler oficial del Benchmark. No es un servicio permanente: se invoca con
+  # "docker compose run --rm crawler ..." para poblar el arbol de ZAP.
+  crawler:
+    build:
+      context: .
+      dockerfile: docker/crawler.Dockerfile
+    image: tft-crawler:1.2
+    networks:
+      - tft-net
+    volumes:
+      # Ruta del host: los bind mounts los resuelve el demonio Docker del host,
+      # tambien cuando es el orquestador quien invoca "docker compose run".
+      - "${TFT_HOST_PROJECT_DIR:?define TFT_HOST_PROJECT_DIR}/results/dast:/out"
+    profiles: ["tools"]
+
+  # Orquestador del pipeline (Python 3.11)
+  orchestrator:
+    build:
+      context: .
+      dockerfile: docker/orchestrator.Dockerfile
+    image: tft-orchestrator:1.0
+    container_name: tft-orchestrator
+    networks:
+      - tft-net
+    working_dir: /work
+    environment:
+      TFT_IN_CONTAINER: "1"
+      # Ruta del proyecto en el host: los bind mounts de los contenedores
+      # hermanos los resuelve el demonio Docker del host, no este contenedor.
+      TFT_HOST_PROJECT_DIR: "${TFT_HOST_PROJECT_DIR:?define TFT_HOST_PROJECT_DIR (usa el Makefile o el .env)}"
+    volumes:
+      - .:/work
+      - /var/run/docker.sock:/var/run/docker.sock
+
+networks:
+  tft-net:
+    name: tft-net

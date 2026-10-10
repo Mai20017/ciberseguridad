@@ -1,0 +1,8 @@
+.git
+external_benchmark_src/.git
+external_benchmark_src/target
+results
+logs
+**/__pycache__
+*.pyc
+.venv

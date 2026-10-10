@@ -1,0 +1,12 @@
+motor,estado,hallazgos
+semgrep,confirmado,1123
+semgrep,descartado,257
+semgrep,no_verificable,529
+spotbugs,confirmado,2133
+spotbugs,descartado,424
+spotbugs,no_verificable,5676
+zap,observado_dast,16251
+TODOS,confirmado,3256
+TODOS,descartado,681
+TODOS,no_verificable,6205
+TODOS,observado_dast,16251

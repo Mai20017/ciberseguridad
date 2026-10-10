@@ -1,0 +1,188 @@
+# Configuracion central del pipeline TFT: reduccion de falsos positivos combinando SAST y DAST
+# Todas las rutas son relativas a la raiz del repositorio.
+
+meta:
+  project: "Framework de reduccion de falsos positivos (SAST + DAST)"
+  benchmark_version: "1.2"
+
+benchmark:
+  repo_url: "https://github.com/OWASP-Benchmark/BenchmarkJava.git"
+  # HEAD de master en el momento de la clonacion. El README del proyecto declara
+  # explicitamente que la release actual (v1.2) es el HEAD de master, no un tag.
+  commit: "8b67a88d73b2594570fc21150705283de884620b"
+  src_dir: "external_benchmark_src"
+  expected_results_csv: "external_benchmark_src/expectedresults-1.2.csv"
+  java_src_root: "external_benchmark_src/src/main/java/org/owasp/benchmark/testcode"
+  classes_dir: "external_benchmark_src/target/classes"
+  # URL publicada en el host (puerto mapeado del contenedor benchmark)
+  host_base_url: "https://localhost:8443/benchmark/"
+  # URL interna dentro de la red Docker (la que usan ZAP y el orquestador)
+  internal_base_url: "https://benchmark:8443/benchmark/"
+  tomcat_version: "9.0.122"
+  startup_timeout_s: 900
+  # Mapa autoritativo del propio Benchmark: una entrada por caso de prueba con
+  # su URL y su vector de entrada exacto (getparam/formparam/header/cookie).
+  # Es la fuente del mapeo SAST -> HTTP de la etapa 5, mas fiable que inferir
+  # el vector leyendo las anotaciones del servlet.
+  crawler_file: "external_benchmark_src/data/benchmark-crawler-http.xml"
+  # Copia con las URL reescritas al host interno de la red Docker: el fichero
+  # original las fija a localhost:8443, y si ZAP registrase ese host atacaria
+  # a su propio contenedor en lugar de al Benchmark.
+  crawler_file_internal: "results/dast/benchmark-crawler-internal.xml"
+  # Crawler oficial: vive en un repositorio aparte, fijado por commit igual
+  # que el Benchmark para que la ejecucion sea repetible.
+  benchmark_utils:
+    repo_url: "https://github.com/OWASP-Benchmark/BenchmarkUtils.git"
+    commit: "ef982a71c377dd43d58652a450bf25fb7a8582ad"
+    # Version del artefacto Maven que instala docker/crawler.Dockerfile. Aporta
+    # tanto el crawler oficial (etapa 3) como el scorer oficial (validacion).
+    version: "1.3"
+
+docker:
+  network: "tft-net"
+  images:
+    maven: "maven:3.9.16-eclipse-temurin-17"
+    python: "python:3.11.17-slim"
+    semgrep: "semgrep/semgrep:1.180.0"
+    zap: "zaproxy/zap-stable:2.15.0"
+  services:
+    benchmark: "benchmark"
+    zap: "zap"
+
+sast:
+  semgrep:
+    rulesets: ["p/java", "p/owasp-top-ten"]
+    timeout_s: 5400
+    output_sarif: "results/sast/semgrep.sarif"
+  spotbugs:
+    # Versiones fijadas por el propio pom.xml del Benchmark v1.2
+    spotbugs_version: "4.10.4"
+    findsecbugs_version: "1.14.0"
+    effort: "max"
+    threshold: "low"
+    output_sarif: "results/sast/spotbugs.sarif"
+
+dast:
+  zap:
+    api_port: 8090
+    api_key: "tft-zap-key"
+    output_json: "results/dast/zap.json"
+    # El 32% de los casos del Benchmark recibe la entrada por cabecera (657) o
+    # cookie (216). Sin estas dos opciones, ZAP no inyectaria ahi y esos casos
+    # saldrian "no confirmados" por configuracion, no por no ser explotables.
+    inject_headers: true
+    inject_cookies: true
+    attack_strength: "MEDIUM"
+    alert_threshold: "LOW"
+    # Hilos por host del escaneo activo. El Benchmark corre en un unico
+    # contenedor, asi que subirlo acelera el escaneo a costa de cargar Tomcat.
+    threads_per_host: 8
+    # 0 = sin limite. Util para acotar el coste del escaneo completo.
+    max_scan_duration_min: 0
+    max_rule_duration_min: 0
+    # Version del plugin que ejecuta el crawler oficial (BenchmarkUtils)
+    crawler_plugin_version: "1.3"
+
+# Reglas de escaneo activo de ZAP que verifican cada CWE, con los identificadores
+# realmente instalados en zaproxy/zap-stable:2.15.0 (add-on ascanrules v69.0.0).
+# La etapa de verificacion crea una politica por CWE con solo estas reglas, para
+# que una alerta de otra familia no pueda confirmar un hallazgo.
+zap_rules_by_cwe:
+  22: [6]                                        # Path Traversal
+  78: [90020]                                    # Remote OS Command Injection
+  79: [40012, 40014, 40016, 40017, 40026]        # XSS reflejado, persistente y DOM
+  89: [40018, 40019, 40020, 40021, 40024, 40027] # Inyeccion SQL (generica y por motor)
+  643: [90021]                                   # XPath Injection
+
+# CWE que se verifican con una regla pasiva en lugar de un escaneo activo: la
+# alerta la genera ZAP al observar la respuesta durante el rastreo.
+zap_passive_cwes: [614]                          # Cookie sin atributo Secure
+
+# CWE del Benchmark que ZAP 2.15 de serie no puede probar por HTTP. Los
+# hallazgos SAST de estos CWE quedan "no verificable", nunca "no confirmado":
+# descartarlos atribuiria al hallazgo una limitacion del motor dinamico.
+#   90  inyeccion LDAP: su regla vive en el add-on ascanrulesBeta, no instalado
+#   327 cifrado roto, 328 hash debil, 330 aleatoriedad debil: propiedades del
+#       codigo, no observables en la respuesta HTTP
+#   501 violacion de limite de confianza: idem
+cwes_no_verificables_por_dast: [90, 327, 328, 330, 501]
+
+# Clustering (apartado 4.4 de la memoria).
+#
+# Las pruebas NO se escriben a mano: las genera ZAP durante el escaneo activo
+# dirigido de la etapa 6. Esta etapa recoge las respuestas HTTP que ZAP provoco
+# sobre cada ruta, les extrae tres rasgos (codigo de estado, longitud y
+# similitud de contenido) y las agrupa con DBSCAN frente a la linea base de
+# referencia de esa misma ruta, que es la respuesta a la entrada valida que
+# envio el crawler del Benchmark. No es una "pagina de rechazo": ver el aviso
+# de terminologia en src/verify/verify_with_zap.py.
+#
+# Si alguna respuesta provocada por ZAP se separa del grupo de la linea base,
+# el hallazgo queda "confirmado"; si todas coinciden con ella, "descartado".
+clustering:
+  eps: 0.6
+  min_samples: 2
+  # Longitud maxima de respuesta que se compara, para acotar el coste
+  max_body_chars: 4000
+  # Tope de respuestas de ZAP que se recogen por cada par (ruta, CWE)
+  max_mensajes_por_par: 60
+  # Linea base de referencia segun Akrout et al. (2014). El metodo original no
+  # compara el ataque con la respuesta normal, sino con DOS clases de
+  # peticiones que fallan a proposito:
+  #   Rr  = valores aleatorios alfanumericos
+  #   Rii = valores malformados (con metacaracteres y delimitadores sin cerrar)
+  # y confirma solo si la respuesta al ataque (Rvi) no se parece a ninguna de
+  # las dos. Con una sola muestra de referencia DBSCAN no tiene estructura de
+  # densidad que agrupar; con estas dos clases si la tiene.
+  #
+  # A 0 cada una, la etapa 6 se comporta como antes (una sola linea base), lo
+  # que permite comparar los dos metodos sobre el mismo trafico.
+  referencias_rr: 5
+  referencias_rii: 5
+  # Cada cuantos pares se reinicia la sesion de ZAP durante la etapa 6.
+  # ZAP recorre su historial de forma lineal: a 400.000 mensajes, leer 100
+  # cuesta 17 s. Reiniciando con regularidad el historial se mantiene pequeno
+  # y las lecturas rapidas, a cambio de repetir el rastreo (unos 20 s).
+  max_pares_por_sesion: 150
+
+# Equivalencias entre el CWE que reporta cada herramienta y el que usa el
+# Benchmark. Sin esta tabla se descartarian hallazgos correctos por un detalle
+# de etiquetado (p. ej. Semgrep reporta 301 hallazgos de cifrado debil como
+# CWE-326 donde el Benchmark dice CWE-327).
+cwe_equivalences:
+  326: 327   # Inadequate Encryption Strength -> Use of Broken Crypto
+  23: 22     # Relative Path Traversal -> Path Traversal
+  36: 22     # Absolute Path Traversal -> Path Traversal
+  564: 89    # SQL Injection via Hibernate -> SQL Injection
+
+evaluation:
+  # Los 11 CWE con casos de prueba en el Benchmark v1.2. Todo hallazgo con un
+  # CWE fuera de esta lista queda fuera del computo (el 59% de los de SpotBugs
+  # son avisos de origen de entrada: CWE-315, CWE-20, CWE-807).
+  benchmark_cwes: [22, 78, 79, 89, 90, 327, 328, 330, 501, 614, 643]
+  # CSRF (CWE-352) se declara excluido en la memoria, pero el Benchmark v1.2 no
+  # contiene ni un caso de esa categoria: la exclusion no elimina nada.
+  excluded_cwes: [352]
+  # Configuraciones del experimento (apartado 4.5 de la memoria)
+  configurations:
+    C0: "cada motor por separado (Semgrep, SpotBugs+FindSecBugs, ZAP)"
+    C1: "union de los motores SAST"
+    C2: "union de los motores DAST"
+    C3: "union de todos los motores"
+    C4: "C3 + confirmacion cruzada + clustering"
+    # Ablaciones de C4: aislan cada senal para poder atribuir la reduccion de
+    # falsos positivos. C4 confirma si la alerta O la separacion confirman, de
+    # modo que sin estas tres no se puede saber cual de las dos filtra.
+    C4a: "C3 + solo alerta de ZAP (sin clustering)"
+    C4b: "C3 + solo separacion por clustering (sin alerta de ZAP)"
+    C4c: "C3 + solo invariancia de la respuesta (sin DBSCAN ni alerta)"
+    # Metodo alternativo, no ablacion: agrupamiento contra las clases de
+    # rechazo Rr y Rii, fiel a Akrout et al. (2014).
+    C4-akrout: "C3 + confirmacion cruzada + agrupamiento contra clases de rechazo (Akrout)"
+    C4-akrout-trivial: "Como C4-akrout pero sin DBSCAN: regla trivial contra las mismas clases de rechazo"
+
+paths:
+  results_dir: "results"
+  logs_dir: "logs"
+  provenance_jsonl: "results/provenance.jsonl"
+  stage_times_csv: "results/stage_times.csv"

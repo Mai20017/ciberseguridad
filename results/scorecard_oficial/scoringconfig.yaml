@@ -1,0 +1,11 @@
+# Generado por src/validate/scorer_oficial.py. Solo para la validacion externa.
+expectedresults: expectedresults-1.2.csv
+resultsfileordir: results
+focustool: none
+anonymousmode: false
+averageonlymode: false
+mixedmode: false
+cwecategoryname: Vulnerabilities
+tprlabel: TPR
+includeprojectlink: false
+includeprecision: true

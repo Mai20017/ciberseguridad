@@ -1,0 +1,20 @@
+# Codigo fuente del Benchmark: no se versiona, se clona fijado al commit
+# declarado en configs/pipeline.yml
+external_benchmark_src/
+
+# Logs crudos de las herramientas (pueden ser de cientos de MB).
+# Los resultados (results/) SI se versionan: son la evidencia del TFT.
+logs/
+
+# Entrada del scorer oficial (~45 MB): son copias reformateadas de
+# results/sast/*.sarif y results/dast/zap.json, que si se versionan, mas el
+# informe XML de SpotBugs, que la etapa "validate" regenera en unos 8 minutos.
+# Los scorecards que produce el scorer (results/scorecard_oficial/scorecard/)
+# SI se versionan: son la evidencia de la validacion.
+results/scorecard_oficial/results/
+results/scorecard_oficial/expectedresults-1.2.csv
+
+__pycache__/
+*.pyc
+.venv/
+.env

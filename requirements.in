@@ -1,0 +1,8 @@
+# Dependencias directas del orquestador (Python 3.11).
+# requirements.txt es el bloqueo completo generado con pip freeze dentro de la
+# imagen, y es el fichero que instala docker/orchestrator.Dockerfile.
+PyYAML          # configs/pipeline.yml
+requests        # API de ZAP y comprobacion del despliegue
+numpy           # rasgos de las respuestas HTTP
+scikit-learn    # DBSCAN del clustering de la etapa 7
+matplotlib      # figuras de results/figuras/

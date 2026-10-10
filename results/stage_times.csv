@@ -1,0 +1,107 @@
+stage,started_at_utc,finished_at_utc,duration_s,status,detail
+1-deploy,2026-10-08T01:38:15+00:00,2026-10-08T01:41:53+00:00,217.8,ok,2740 casos de prueba; arranque 40.1s; url=https://benchmark:8443/benchmark/
+2a-sast-semgrep,2026-10-08T01:37:00+00:00,2026-10-08T01:47:45+00:00,645.05,ok,"1909 hallazgos; rulesets=p/java,p/owasp-top-ten"
+2b-sast-spotbugs,2026-10-08T01:48:05+00:00,2026-10-08T01:56:07+00:00,482.72,error: RuntimeError,
+2b-sast-spotbugs,2026-10-08T01:58:32+00:00,2026-10-08T02:06:28+00:00,476.01,ok,8233 hallazgos; SpotBugs 4.10.4 + FindSecBugs 1.14.0
+3-dast,2026-10-08T03:30:53+00:00,2026-10-08T03:30:53+00:00,0.03,error: TypeError,
+3b-dast-crawl,2026-10-08T03:31:56+00:00,2026-10-08T03:32:00+00:00,4.17,error: RuntimeError,
+3-dast,2026-10-08T03:31:55+00:00,2026-10-08T03:32:00+00:00,5.01,error: RuntimeError,
+3b-dast-crawl,2026-10-08T03:33:31+00:00,2026-10-08T03:33:49+00:00,17.9,ok,2780 URLs registradas en el arbol de ZAP
+3-dast,2026-10-08T03:33:24+00:00,2026-10-08T03:33:49+00:00,24.78,error: KeyError,
+3b-dast-crawl,2026-10-08T03:35:23+00:00,2026-10-08T03:35:37+00:00,14.41,ok,2780 URLs registradas en el arbol de ZAP
+3c-dast-active-scan,2026-10-08T03:35:37+00:00,2026-10-08T04:47:53+00:00,4336.41,ok,scan 0 en 4336.4s
+3-dast,2026-10-08T03:35:22+00:00,2026-10-08T04:48:31+00:00,4389.78,ok,ZAP 2.15.0; 16600 alertas; escaneo 4336.4s
+4-normalize,2026-10-08T04:48:56+00:00,2026-10-08T04:48:57+00:00,0.91,ok,"26742 hallazgos ({'semgrep': 1909, 'spotbugs': 8233, 'zap': 16600}); 6072 en ambito"
+5-map,2026-10-08T04:48:57+00:00,2026-10-08T04:48:57+00:00,0.46,ok,"26047 mapeados, 695 sin ruta HTTP; criterios={'por_nombre': 2259, 'por_valor': 394, 'por_descarte': 87}"
+8-evaluate,2026-10-08T04:49:20+00:00,2026-10-08T04:49:21+00:00,0.37,ok,6 configuraciones evaluadas sobre 2740 casos
+3b-dast-crawl,2026-10-08T04:55:03+00:00,2026-10-08T04:55:24+00:00,21.17,ok,2780 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T04:57:02+00:00,2026-10-08T04:57:17+00:00,14.8,ok,2779 URLs registradas en el arbol de ZAP
+6-verify,2026-10-08T04:57:01+00:00,2026-10-08T08:51:30+00:00,14069.72,ok,"3073 pares verificados; 1978 respuestas de ZAP; {'no_confirmado': 2339, 'no_verificable': 7034, 'confirmado': 769, 'observado_dast': 16600}"
+7-cluster,2026-10-08T09:01:37+00:00,2026-10-08T09:01:40+00:00,2.65,ok,"clustering={'confirmado': 2431, 'no_verificable': 23671, 'descartado': 640}; final={'confirmado': 2563, 'no_verificable': 7034, 'descartado': 545, 'observado_dast': 16600}"
+8-evaluate,2026-10-08T09:01:51+00:00,2026-10-08T09:01:52+00:00,1.42,ok,7 configuraciones evaluadas sobre 2740 casos
+8-evaluate,2026-10-08T09:03:51+00:00,2026-10-08T09:03:52+00:00,1.07,ok,7 configuraciones evaluadas sobre 2740 casos
+3b-dast-crawl,2026-10-08T09:08:35+00:00,2026-10-08T09:09:02+00:00,27.34,ok,2777 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T09:09:40+00:00,2026-10-08T09:09:56+00:00,16.04,ok,2779 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T09:11:13+00:00,2026-10-08T09:11:27+00:00,13.66,ok,2779 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T09:12:57+00:00,2026-10-08T09:13:11+00:00,13.43,ok,2780 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T09:13:40+00:00,2026-10-08T09:13:53+00:00,13.57,ok,2780 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T09:15:21+00:00,2026-10-08T09:15:32+00:00,11.91,ok,2778 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T09:15:49+00:00,2026-10-08T09:16:02+00:00,12.44,ok,2778 URLs registradas en el arbol de ZAP
+1-deploy,2026-10-08T09:17:20+00:00,2026-10-08T09:24:30+00:00,429.72,ok,2740 casos de prueba; arranque 0.1s; url=https://benchmark:8443/benchmark/
+2a-sast-semgrep,2026-10-08T09:24:33+00:00,2026-10-08T09:33:29+00:00,535.92,ok,"1909 hallazgos; rulesets=p/java,p/owasp-top-ten"
+2b-sast-spotbugs,2026-10-08T09:33:29+00:00,2026-10-08T09:34:51+00:00,82.49,ok,8233 hallazgos; SpotBugs 4.10.4 + FindSecBugs 1.14.0
+2-sast,2026-10-08T09:24:30+00:00,2026-10-08T09:34:51+00:00,621.57,ok,semgrep=1909; spotbugs=8233
+3b-dast-crawl,2026-10-08T09:34:52+00:00,2026-10-08T09:35:11+00:00,18.8,ok,2781 URLs registradas en el arbol de ZAP
+3c-dast-active-scan,2026-10-08T09:35:11+00:00,2026-10-08T10:44:27+00:00,4156.48,ok,scan 0 en 4156.5s
+3-dast,2026-10-08T09:34:51+00:00,2026-10-08T10:45:09+00:00,4218.02,ok,ZAP 2.15.0; 16251 alertas; escaneo 4156.5s
+4-normalize,2026-10-08T10:45:09+00:00,2026-10-08T10:45:10+00:00,0.97,ok,"26393 hallazgos ({'semgrep': 1909, 'spotbugs': 8233, 'zap': 16251}); 6070 en ambito"
+5-map,2026-10-08T10:45:10+00:00,2026-10-08T10:45:11+00:00,0.53,ok,"25698 mapeados, 695 sin ruta HTTP; criterios={'por_nombre': 2259, 'por_valor': 394, 'por_descarte': 87}"
+3b-dast-crawl,2026-10-08T10:54:53+00:00,2026-10-08T10:55:09+00:00,16.21,ok,2777 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T11:28:11+00:00,2026-10-08T11:28:23+00:00,12.88,ok,2778 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T11:51:21+00:00,2026-10-08T11:51:33+00:00,11.87,ok,2776 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T11:59:21+00:00,2026-10-08T11:59:32+00:00,11.53,ok,2775 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T12:07:14+00:00,2026-10-08T12:07:25+00:00,11.52,ok,2776 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T12:16:08+00:00,2026-10-08T12:16:19+00:00,11.15,ok,2776 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T12:32:53+00:00,2026-10-08T12:33:05+00:00,11.76,ok,2776 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T12:49:43+00:00,2026-10-08T12:49:54+00:00,11.26,ok,2776 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T13:05:56+00:00,2026-10-08T13:06:08+00:00,11.35,ok,2777 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T13:17:49+00:00,2026-10-08T13:18:00+00:00,11.28,ok,2779 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T13:29:46+00:00,2026-10-08T13:29:58+00:00,12.0,ok,2779 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T13:40:43+00:00,2026-10-08T13:40:55+00:00,11.71,ok,2776 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-08T13:52:18+00:00,2026-10-08T13:52:29+00:00,11.28,ok,2779 URLs registradas en el arbol de ZAP
+6-verify,2026-10-08T10:45:11+00:00,2026-10-08T14:02:02+00:00,11812.58,ok,"3073 pares verificados; 90673 respuestas de ZAP; {'no_confirmado': 2370, 'no_verificable': 7032, 'confirmado': 740, 'observado_dast': 16251}"
+7-cluster,2026-10-08T14:02:03+00:00,2026-10-08T14:02:05+00:00,2.8,ok,"clustering={'confirmado': 2418, 'no_verificable': 23319, 'descartado': 656}; final={'confirmado': 2544, 'no_verificable': 7032, 'descartado': 566, 'observado_dast': 16251}"
+8-evaluate,2026-10-08T14:02:05+00:00,2026-10-08T14:02:07+00:00,1.75,ok,7 configuraciones evaluadas sobre 2740 casos
+8-evaluate,2026-10-08T14:17:55+00:00,2026-10-08T14:17:57+00:00,1.35,ok,7 configuraciones evaluadas sobre 2740 casos
+9-validacion-scorer-oficial,2026-10-09T05:18:39+00:00,2026-10-09T05:18:51+00:00,12.44,ok,22/24 metricas coinciden con BenchmarkUtils; recuentos exactos 12/12
+9-validacion-scorer-oficial,2026-10-09T05:19:26+00:00,2026-10-09T05:19:38+00:00,12.56,ok,24/24 metricas coinciden con BenchmarkUtils; recuentos exactos 12/12
+9-validacion-scorer-oficial,2026-10-09T05:20:52+00:00,2026-10-09T05:21:05+00:00,13.06,ok,24/24 metricas coinciden con BenchmarkUtils; recuentos exactos 12/12; coincidencia caso a caso 0/3
+9-validacion-scorer-oficial,2026-10-09T05:21:39+00:00,2026-10-09T05:21:54+00:00,14.44,ok,24/24 metricas coinciden con BenchmarkUtils; recuentos exactos 12/12; coincidencia caso a caso 3/3
+8-evaluate,2026-10-09T05:22:05+00:00,2026-10-09T05:22:06+00:00,1.14,ok,7 configuraciones evaluadas sobre 2740 casos
+8-evaluate,2026-10-09T05:24:27+00:00,2026-10-09T05:24:28+00:00,1.0,ok,7 configuraciones evaluadas sobre 2740 casos
+3b-dast-crawl,2026-10-09T14:29:30+00:00,2026-10-09T14:29:59+00:00,28.46,ok,2775 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T14:33:01+00:00,2026-10-09T14:33:21+00:00,19.82,ok,2776 URLs registradas en el arbol de ZAP
+10-sensibilidad-clustering,2026-10-09T14:39:11+00:00,2026-10-09T14:40:15+00:00,63.65,ok,30 combinaciones; FP distintos=1; trivial FP=468
+11-carga-revision,2026-10-09T14:40:38+00:00,2026-10-09T14:40:38+00:00,0.35,ok,C4 entrega 25827 hallazgos (8069 items distintos); reduccion de items vs C1 4.43%
+11-carga-revision,2026-10-09T14:41:04+00:00,2026-10-09T14:41:04+00:00,0.35,ok,C4 entrega 25827 hallazgos (18291 items distintos); reduccion de items vs C1 -116.64%
+11-carga-revision,2026-10-09T14:41:56+00:00,2026-10-09T14:41:57+00:00,0.91,ok,C4 entrega 25827 hallazgos (18291 items distintos); reduccion de items vs C1 -116.64%
+3b-dast-crawl,2026-10-09T15:14:08+00:00,2026-10-09T15:14:20+00:00,12.76,ok,2779 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T15:50:12+00:00,2026-10-09T15:50:28+00:00,15.91,ok,2780 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T15:59:13+00:00,2026-10-09T15:59:25+00:00,12.35,ok,2778 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T16:08:06+00:00,2026-10-09T16:08:19+00:00,13.54,ok,2777 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T16:17:02+00:00,2026-10-09T16:17:14+00:00,12.41,ok,2778 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T16:26:37+00:00,2026-10-09T16:26:49+00:00,12.16,ok,2778 URLs registradas en el arbol de ZAP
+12-informe,2026-10-09T16:48:42+00:00,2026-10-09T16:48:43+00:00,1.69,ok,18291 items en la lista; 1870 confirmados
+12-informe,2026-10-09T16:49:02+00:00,2026-10-09T16:49:03+00:00,1.02,ok,18291 items en la lista; 1870 confirmados
+3b-dast-crawl,2026-10-09T16:51:16+00:00,2026-10-09T16:51:43+00:00,27.05,ok,2780 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T17:32:08+00:00,2026-10-09T17:32:46+00:00,37.95,ok,2776 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T17:48:58+00:00,2026-10-09T17:49:30+00:00,31.68,ok,2776 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T17:50:49+00:00,2026-10-09T17:51:01+00:00,12.42,ok,2777 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T17:51:52+00:00,2026-10-09T17:52:04+00:00,12.54,ok,2777 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T17:52:32+00:00,2026-10-09T17:52:44+00:00,12.2,ok,2777 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T17:55:03+00:00,2026-10-09T17:55:16+00:00,12.77,ok,2776 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T17:56:05+00:00,2026-10-09T17:56:18+00:00,13.23,ok,2778 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T18:11:24+00:00,2026-10-09T18:11:37+00:00,13.35,ok,2779 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T18:27:49+00:00,2026-10-09T18:28:05+00:00,16.52,ok,2776 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T18:38:26+00:00,2026-10-09T18:38:40+00:00,13.71,ok,2780 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T18:48:38+00:00,2026-10-09T18:48:51+00:00,12.5,ok,2780 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T18:58:30+00:00,2026-10-09T18:58:42+00:00,11.78,ok,2777 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T19:09:22+00:00,2026-10-09T19:09:33+00:00,10.97,ok,2777 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T19:31:40+00:00,2026-10-09T19:31:51+00:00,11.39,ok,2777 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T19:54:12+00:00,2026-10-09T19:54:25+00:00,12.73,ok,2778 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T20:16:10+00:00,2026-10-09T20:16:21+00:00,11.6,ok,2777 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T20:35:45+00:00,2026-10-09T20:35:56+00:00,11.55,ok,2776 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T20:49:44+00:00,2026-10-09T20:49:56+00:00,11.43,ok,2775 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T21:03:58+00:00,2026-10-09T21:04:10+00:00,11.87,ok,2777 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T21:18:15+00:00,2026-10-09T21:18:27+00:00,11.99,ok,2777 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T21:30:18+00:00,2026-10-09T21:30:30+00:00,12.17,ok,2778 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T21:43:21+00:00,2026-10-09T21:43:33+00:00,11.73,ok,2778 URLs registradas en el arbol de ZAP
+3b-dast-crawl,2026-10-09T21:56:47+00:00,2026-10-09T21:56:58+00:00,11.48,ok,2778 URLs registradas en el arbol de ZAP
+6-verify,2026-10-09T17:56:04+00:00,2026-10-09T21:59:08+00:00,14585.66,ok,"3073 pares verificados; 2423 escaneos activos; 557045 peticiones HTTP; 141128 respuestas de ZAP; {'no_confirmado': 3013, 'no_verificable': 6205, 'confirmado': 924, 'observado_dast': 16251}"
+7-cluster,2026-10-09T21:59:09+00:00,2026-10-09T21:59:15+00:00,6.28,ok,"clustering={'confirmado': 3227, 'no_verificable': 22492, 'descartado': 674}; final={'confirmado': 3256, 'no_verificable': 6205, 'descartado': 681, 'observado_dast': 16251}; pares agrupados=2423; discrepancias DBSCAN vs invariancia=0"
+8-evaluate,2026-10-09T21:59:15+00:00,2026-10-09T21:59:17+00:00,1.6,ok,11 configuraciones evaluadas sobre 2740 casos
+12-informe,2026-10-09T21:59:17+00:00,2026-10-09T21:59:17+00:00,0.56,ok,18211 items en la lista; 2376 confirmados
+7-cluster,2026-10-09T22:02:56+00:00,2026-10-09T22:03:02+00:00,6.22,ok,"clustering={'confirmado': 3227, 'no_verificable': 22492, 'descartado': 674}; final={'confirmado': 3256, 'no_verificable': 6205, 'descartado': 681, 'observado_dast': 16251}; pares agrupados=2423; discrepancias DBSCAN vs invariancia=0"
+8-evaluate,2026-10-09T22:03:02+00:00,2026-10-09T22:03:03+00:00,1.23,ok,12 configuraciones evaluadas sobre 2740 casos
+12-informe,2026-10-09T22:03:03+00:00,2026-10-09T22:03:04+00:00,0.53,ok,18211 items en la lista; 2376 confirmados
+10-sensibilidad-clustering,2026-10-10T18:10:55+00:00,2026-10-10T18:12:30+00:00,95.08,ok,30 combinaciones; FP distintos=1; trivial FP=397

@@ -1,0 +1,4 @@
+configuracion,detecciones_scorer_oficial,detecciones_mi_pipeline,solo_en_el_oficial,solo_en_el_mio,coinciden_exactamente
+C0-semgrep,1482,1482,0,0,si
+C0-spotbugs,2015,2015,0,0,si
+C0-zap,549,549,0,0,si
