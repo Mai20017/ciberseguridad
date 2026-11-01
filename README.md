@@ -182,6 +182,54 @@ deteccion, igual que en el scorer oficial del Benchmark.
   linea de los hallazgos SAST dejarian de corresponder al commit analizado.
 - **CSRF (CWE-352) no tiene ni un caso en el Benchmark v1.2**, por lo que su
   exclusion no elimina nada.
+- **Por que el umbral del agrupamiento es `eps = 0.6` con `min_samples = 2`.**
+  Los tres rasgos de cada respuesta (codigo de estado, longitud y similitud con
+  la linea base) se estandarizan por par (ruta, CWE) con `StandardScaler` antes
+  de DBSCAN, de modo que `eps` se mide en desviaciones tipicas: una respuesta de
+  ZAP queda en el grupo de la linea base si esta a menos de 0.6 desviaciones
+  tipicas de algun punto de ese grupo. `min_samples = 2` es el minimo de
+  scikit-learn (el propio punto cuenta), el unico con el que la linea base, que
+  es una sola muestra por ruta, puede formar grupo con una sola respuesta igual.
+
+  El valor no procede de un criterio fijado de antemano: se justifica por su
+  **robustez medida**. La etapa `sensibilidad`
+  (`results/sensibilidad_clustering.csv`) barre 30 combinaciones de `eps` (0.1
+  a 2.0) y `min_samples` (2, 3 y 5). Todas dan los mismos 397 FP, y de
+  `eps = 0.1` a `eps = 1.5` el resultado es identico para cualquier
+  `min_samples` (1373 VP, 397 FP, 42 FN). Solo con `eps = 2.0` se pierden 2 VP
+  (1371 VP, 44 FN). Con `eps = 1.5` se confirma un par menos (2063 frente a
+  2064), pero ese par no altera ninguna cifra de la evaluacion. 0.6 queda dentro
+  de ese intervalo estable y lejos de sus extremos, de modo que la conclusion no
+  depende de haber elegido este valor y no otro.
+
+  El criterio clasico para fijar `eps`, el grafico de k-distancia de Ester et
+  al. (1996) con k = `min_samples` - 1 = 1, explica por que el intervalo es tan
+  amplio. En los 2064 pares en que no todas las respuestas son identicas
+  (95 717 puntos entre lineas base y respuestas de ZAP), el 96 % de los puntos
+  tiene su vecino mas cercano a menos de 0.11 desviaciones tipicas, y solo una
+  cola del 1-2 % queda aislada (p98 = 0.26, p99 = 0.77; el codo de la curva cae
+  en torno a 0.03). Los grupos estan tan separados que cualquier `eps` entre
+  0.1 y 1.0 corta en el mismo sitio. Aplicado al pie de la letra, ese criterio
+  daria un valor menor que 0.6, pero el mismo resultado. La medicion tambien
+  muestra la limitacion del metodo: con una sola muestra de referencia, DBSCAN
+  da lo mismo que una regla trivial de invariancia (ver
+  `docs/HACIA-UNA-APLICACION-REAL.md`).
+- **El objetivo se degrada durante el escaneo: ZAP vacia `/etc/passwd`.** Los
+  casos de path traversal del Benchmark abren para escritura la ruta que
+  reciben, y cuando ZAP envia `../../etc/passwd` el fichero queda truncado a 0
+  bytes. La regla de inyeccion de comandos de ZAP (90020) confirma buscando
+  `root:x:0:0` en la respuesta, asi que a partir de ese momento ya no puede
+  confirmar nada. En la etapa 6 los pares de CWE-78 se verifican antes que los
+  de CWE-22. Con un contenedor recien creado, el fichero sigue intacto mientras
+  se prueban (se vacio a los 42-47 minutos de empezar) y C4a obtiene 99 VP en
+  CWE-78. En la ejecucion versionada en `results/`, el contenedor arrastraba
+  escaneos anteriores, el fichero ya estaba vacio y C4a obtiene 78 VP (la verificacion
+  dirigida confirmo 3 casos vulnerables de CWE-78, frente a 25 con el
+  contenedor limpio). **C3 y C4 no cambian**, porque C4
+  confirma CWE-78 por la separacion de respuestas, que no depende del contenido
+  del fichero. Por esto el contenedor del Benchmark debe recrearse antes de
+  repetir la etapa 6 (`docker compose rm -sf benchmark` y despues la etapa
+  `deploy`).
 
 ## Reproducibilidad
 
@@ -198,6 +246,15 @@ deteccion, igual que en el scorer oficial del Benchmark.
 - `results/stage_times.csv` registra el tiempo de cada etapa y
   `results/provenance.jsonl` la fecha, el entorno y la version exacta que cada
   herramienta reporta de si misma.
+- **Estabilidad entre ejecuciones.** Las etapas 6 a 9 se repitieron dos veces
+  mas sobre contenedores limpios. C3 y C4 dieron exactamente las mismas cifras
+  en las tres ejecuciones (desviacion tipica 0 en VP, FP, FN, precision,
+  exhaustividad, F1 y puntuacion): la reduccion de falsos positivos no depende
+  del trafico concreto que genera ZAP en cada pasada. La etapa 6 tardo
+  3.82 ± 0.20 h (14 586, 13 499 y 13 198 s). La unica diferencia aparece en
+  C4a y se explica por el estado del contenedor (punto sobre `/etc/passwd` en
+  «Decisiones metodologicas»), no por varianza: las dos repeticiones
+  coinciden entre si.
 - El codigo de evaluacion esta contrastado con el scorer oficial del Benchmark
   (ver «Validacion externa de las metricas»), de modo que las cifras no dependen
   de que la metodologia de puntuacion se haya reimplementado bien.
